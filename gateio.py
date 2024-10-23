@@ -7,8 +7,16 @@ from  btcBase import *
 from  MyTT import *
 
 host = "https://api.gateio.ws"
-key = '7be72d12e1feffb96d864c2442a327a5'        # api_key
-secret = 'd39996fdb4e9228725d7e16b5244d067ff121e6010d2815c5318722e1e9c5eda'     # api_secret
+key = ''        # api_key
+secret = ''     # api_secret
+
+def setKey(realKey):
+    global key
+    key = realKey
+
+def setSecret(realSecret):
+    global secret
+    secret = realSecret
 
 class Gateio(BtcBase):
     
