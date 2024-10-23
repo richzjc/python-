@@ -5,6 +5,7 @@ urllib3.disable_warnings()
 import time, hashlib, hmac, requests, json
 from  btcBase import *
 from  MyTT import *
+from btcBase import *
 
 biCodes = []
 realCodes = []
@@ -43,9 +44,6 @@ def getRealCodes():
             else:
                 index = index + 1
                 time.sleep(1)
-        if tempCodes:
-            print(tempCodes[0])
-            break
     global realCodes
     realCodes = tempCodes
     fenxi()
