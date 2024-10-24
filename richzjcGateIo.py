@@ -168,10 +168,11 @@ def fenxiRsi(df):
     return True
 
 def genPic(df, code, period):
+    print("genPic")
     title = code + ", " + period
-    fig, axe = mpf.plot(df, type='candle', style="yahoo", mav=(5,10,15,20,25,30,35,40,45,50,55,60), volume=False)
+    fig, axe = mpf.plot(df, type='candle', style="yahoo", mav=(5,10,15,20,30,45,60), title=title, volume=False)
     # fig, axe = mpf.plot(df, type='candle', style='yahoo',title=title, volume=True, addplot=lines, returnfig=True)
-
+    print("genPic1")
     buffer = io.BytesIO()
     fig.savefig(buffer, format='jpg')
     plt.close()
@@ -183,6 +184,7 @@ def genPic(df, code, period):
     postImageToBot(imageBase64, md5Value)    
 
 def postImageToBot(imageBase64, md5Value):
+        print("postImageToBot")
         data =  {
             "msgtype": "image",
             "image": {
@@ -193,6 +195,7 @@ def postImageToBot(imageBase64, md5Value):
         _postToBot(data)
 
 def _postToBot(data):
+    print("postToBot")
     url = "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=7c5256e0-68cc-4f41-afa5-90ad13c7a87f"
     json_data = json.dumps(data)
     requests.post(url, data=json_data, headers=COMMON_HEADERS)
