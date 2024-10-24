@@ -74,6 +74,7 @@ def realFenxi(text, code):
     df['Date'] = df['Date'].dt.tz_convert('Asia/Shanghai')
     df = df.drop('t', axis=1)
     df.set_index('Date', inplace=True)
+    df.rename(columns={'sum': 'Volumn', 'o': 'Open', "h" : "High", "c" : "Close", "l" : "Low"})
     if makeData(df, code):
         print("发送到机器人")
 
@@ -81,14 +82,14 @@ def realFenxi(text, code):
 def makeData(df, code):
     """这个是文档描述"""
     #第一步计算closePx的RSI
-    df['rsi5'] = RSI(list(map(float, df.c.values)), 5)
-    df['rsi10'] = RSI(list(map(float, df.c.values)),10)
-    df['rsi20'] = RSI(list(map(float, df.c.values)),20)
+    df['rsi5'] = RSI(list(map(float, df.Close.values)), 5)
+    df['rsi10'] = RSI(list(map(float, df.Close.values)),10)
+    df['rsi20'] = RSI(list(map(float, df.Close.values)),20)
     result = fenxiRsi(df)
     if not result:
         return False
     
-    diff, dea, macd = MACD(list(map(float, df.c.values)), 5, 10, 5)
+    diff, dea, macd = MACD(list(map(float, df.Close.values)), 5, 10, 5)
     df['DIFF'] = diff
     df['DEA'] = dea
     df['MACD'] = macd
@@ -96,7 +97,7 @@ def makeData(df, code):
     if not result:
         return False
 
-    K,D,J = KDJ(list(map(float, df.c.values)), list(map(float, df.h.values)),list(map(float, df.l.values)),10, 3, 3)
+    K,D,J = KDJ(list(map(float, df.Close.values)), list(map(float, df.High.values)),list(map(float, df.Low.values)),10, 3, 3)
     df["K"] = K
     df["D"] = D
     df["J"] = J
@@ -105,18 +106,18 @@ def makeData(df, code):
     if not result:
         return False
 
-    df["ma5"] = MA(list(map(float, df.c.values)), 5)
-    df["ma10"] = MA(list(map(float, df.c.values)), 10)
-    df["ma15"] = MA(list(map(float, df.c.values)), 15)
-    df["ma20"] = MA(list(map(float, df.c.values)), 20)
-    df["ma25"] = MA(list(map(float, df.c.values)), 25)
-    df["ma30"] = MA(list(map(float, df.c.values)), 30)
-    df["ma35"] = MA(list(map(float, df.c.values)), 35)
-    df["ma40"] = MA(list(map(float, df.c.values)), 40)
-    df["ma45"] = MA(list(map(float, df.c.values)), 45)
-    df["ma50"] = MA(list(map(float, df.c.values)), 50)
-    df["ma55"] = MA(list(map(float, df.c.values)), 55)
-    df["ma60"] = MA(list(map(float, df.c.values)), 60)
+    df["ma5"] = MA(list(map(float, df.Close.values)), 5)
+    df["ma10"] = MA(list(map(float, df.Close.values)), 10)
+    df["ma15"] = MA(list(map(float, df.Close.values)), 15)
+    df["ma20"] = MA(list(map(float, df.Close.values)), 20)
+    df["ma25"] = MA(list(map(float, df.Close.values)), 25)
+    df["ma30"] = MA(list(map(float, df.Close.values)), 30)
+    df["ma35"] = MA(list(map(float, df.Close.values)), 35)
+    df["ma40"] = MA(list(map(float, df.Close.values)), 40)
+    df["ma45"] = MA(list(map(float, df.Close.values)), 45)
+    df["ma50"] = MA(list(map(float, df.Close.values)), 50)
+    df["ma55"] = MA(list(map(float, df.Close.values)), 55)
+    df["ma60"] = MA(list(map(float, df.Close.values)), 60)
 
     result = fenxiMA(df)
     if not result:
