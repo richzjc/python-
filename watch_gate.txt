@@ -1,0 +1,2 @@
+BCH5L_USDT,10,minute,1m,1
+
