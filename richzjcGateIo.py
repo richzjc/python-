@@ -1,7 +1,6 @@
 #Gate行情功能函数
 import json,requests,urllib3;   
 import pandas as pd;  
-urllib3.disable_warnings()
 import time, hashlib, hmac, requests, json
 from  btcBase import *
 from  MyTT import *
@@ -124,7 +123,7 @@ def makeData(df, code):
         return False
 
     print(df)
-    print(code)
+    genPic(df, code, "1d")
     return True
 
 def fenxiMA(df):
@@ -166,7 +165,20 @@ def fenxiRsi(df):
             return False
     return True
 
+def genPic(df, code, period):
+    title = code + ", " + period
+    fig, axe = mpf.plot(df, type='candle', style="yahoo", mav=(5,10,15,20,25,30,35,40,45,50,55,60), volume=False)
+    # fig, axe = mpf.plot(df, type='candle', style='yahoo',title=title, volume=True, addplot=lines, returnfig=True)
 
+    buffer = io.BytesIO()
+    fig.savefig(buffer, format='jpg')
+    plt.close()
+    buffer.seek(0)
+    md5 = hashlib.md5()
+    md5.update(buffer.getvalue())
+    md5Value = md5.hexdigest()
+    imageBase64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+    postImageToBot(imageBase64, md5Value)    
 
 def postImageToBot(imageBase64, md5Value):
         data =  {

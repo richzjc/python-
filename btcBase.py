@@ -12,7 +12,7 @@ COMMON_HEADERS = {'Accept': 'application/json', 'Content-Type': 'application/jso
 
 def testPlt():
     # 本地调试PLT
-    return False
+    return True
 
 class BtcBase:
     def __init__(self, name, webUrl, enable = True, sleepStart = 2, sleepEnd = 7,bot='1m'):  
