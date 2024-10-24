@@ -74,7 +74,8 @@ def realFenxi(text, code):
     df['Date'] = df['Date'].dt.tz_convert('Asia/Shanghai')
     df = df.drop('t', axis=1)
     df.set_index('Date', inplace=True)
-    df.rename(columns={'sum': 'Volumn', 'o': 'Open', "h" : "High", "c" : "Close", "l" : "Low"})
+    df = df.rename(columns={'sum': 'Volumn', 'o': 'Open', "h" : "High", "c" : "Close", "l" : "Low"})
+    print(df)
     if makeData(df, code):
         print("发送到机器人")
 
