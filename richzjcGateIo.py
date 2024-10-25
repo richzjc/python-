@@ -201,7 +201,7 @@ def genPic(df, code, period):
     ]
 
     # 自定义颜色
-    figurature = mpf.plot(df, type='candle', style="yahoo", mav=(5,10,15,20,30,45,60), title=title, addplot=lines, volume=False, linewidth=1.0)
+    figurature = mpf.plot(df, type='candle', style="yahoo", mav=(5,10,15,20,30,45,60), title=title, addplot=lines, volume=False, width=1.0)
 
     # fig, axe = mpf.plot(df, type='candle', style='yahoo',title=title, volume=True, addplot=lines, returnfig=True)
     # buffer = io.BytesIO()
