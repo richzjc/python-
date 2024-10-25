@@ -25,26 +25,27 @@ def realLoadCodes():
 
 def getRealCodes():
     tempCodes = []
-    for code in biCodes:
-        result = 0
-        index = 0
-        while result != 200 and index <= 20:
-            url = f"https://api.gateio.ws/api/v4/futures/usdt/candlesticks?contract={code.upper()}&limit=2&interval=1d"
-            res = requests.get(url)
-            lines = []
-            if res.status_code == 200:
-                lines = json.loads(res.text)
-                result = 200
-                totalSum = 0.0
-                if len(lines) == 1:
-                    totalSum = float(lines[0]["sum"])
-                elif len(lines) > 1:
-                    totalSum = float(lines[0]["sum"]) + float(lines[1]["sum"])
-                if totalSum >= 1000000:
-                    tempCodes.append(code)
-            else:
-                index = index + 1
-                time.sleep(1)
+    tempCodes = biCodes
+    # for code in biCodes:
+    #     result = 0
+    #     index = 0
+    #     while result != 200 and index <= 20:
+    #         url = f"https://api.gateio.ws/api/v4/futures/usdt/candlesticks?contract={code.upper()}&limit=2&interval=1d"
+    #         res = requests.get(url)
+    #         lines = []
+    #         if res.status_code == 200:
+    #             lines = json.loads(res.text)
+    #             result = 200
+    #             totalSum = 0.0
+    #             if len(lines) == 1:
+    #                 totalSum = float(lines[0]["sum"])
+    #             elif len(lines) > 1:
+    #                 totalSum = float(lines[0]["sum"]) + float(lines[1]["sum"])
+    #             if totalSum >= 1000000:
+    #                 tempCodes.append(code)
+    #         else:
+    #             index = index + 1
+    #             time.sleep(1)
     global realCodes
     realCodes = tempCodes
     fenxi()
@@ -75,9 +76,8 @@ def realFenxi(text, code):
     df = df.drop('t', axis=1)
     df.set_index('Date', inplace=True)
     df = df.rename(columns={'sum': 'Volumn', 'o': 'Open', "h" : "High", "c" : "Close", "l" : "Low"})
-    print(df)
-    if makeData(df, code):
-        print("发送到机器人")
+    makeData(df, code)
+    
 
 
 def makeData(df, code):
@@ -129,7 +129,24 @@ def makeData(df, code):
     return True
 
 def fenxiMA(df):
-    print("分析MA")
+    lastDf = df.tail(2)
+    five0 = float(lastDf["ma5"].iloc[1])
+    five1 = float(lastDf["ma5"].iloc[0])
+    if math.isnan(five0) or math.isnan(five1):
+        return False
+
+    if five0 <= five1:
+        return False
+    
+    ten0 = float(lastDf["ma10"].iloc[1])
+    if math.isnan(ten0) or ten0 <= 0:
+        return False
+
+    maKey = ["ma5", "ma10", "ma15", "ma20", "ma25", "ma30", "ma35", "ma40", "ma45", "ma50", "ma55", "ma60"]
+    largeMaList = []
+    for key in maKey:
+        print("")
+
     return True
 
 def fenxiKDJ(df):
@@ -168,23 +185,36 @@ def fenxiRsi(df):
     return True
 
 def genPic(df, code, period):
-    print("genPic")
     title = code + ", " + period
-    fig, axe = mpf.plot(df, type='candle', style="yahoo", mav=(5,10,15,20,30,45,60), title=title, volume=False)
+    df = df.tail(100)
+    lines = [
+        mpf.make_addplot(df['K'], panel=1, color='purple', label="KDJ", secondary_y=True, width=1),
+        mpf.make_addplot(df['D'],panel=1, color='green', secondary_y=True, width=1),
+        mpf.make_addplot(df['J'], panel=1, color='red', secondary_y=True, width=1),
+
+        mpf.make_addplot(df['DIFF'], panel=2, color='purple',label="MACD", secondary_y=True, width=1),
+        mpf.make_addplot(df['DEA'], panel=2, color='green',  secondary_y=True, width=1),
+
+        mpf.make_addplot(df['rsi5'], panel=3, color='purple', label="RSI", secondary_y=True, width=1),
+        mpf.make_addplot(df['rsi10'],panel=3, color='green', secondary_y=True, width=1),
+        mpf.make_addplot(df['rsi20'], panel=3, color='red', secondary_y=True, width=1)
+    ]
+
+    # 自定义颜色
+    figurature = mpf.plot(df, type='candle', style="yahoo", mav=(5,10,15,20,30,45,60), title=title, addplot=lines, volume=False, linewidth=1.0)
+
     # fig, axe = mpf.plot(df, type='candle', style='yahoo',title=title, volume=True, addplot=lines, returnfig=True)
-    print("genPic1")
-    buffer = io.BytesIO()
-    fig.savefig(buffer, format='jpg')
-    plt.close()
-    buffer.seek(0)
-    md5 = hashlib.md5()
-    md5.update(buffer.getvalue())
-    md5Value = md5.hexdigest()
-    imageBase64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
-    postImageToBot(imageBase64, md5Value)    
+    # buffer = io.BytesIO()
+    # fig.savefig(buffer, format='jpg')
+    # plt.close()
+    # buffer.seek(0)
+    # md5 = hashlib.md5()
+    # md5.update(buffer.getvalue())
+    # md5Value = md5.hexdigest()
+    # imageBase64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+    # postImageToBot(imageBase64, md5Value)    
 
 def postImageToBot(imageBase64, md5Value):
-        print("postImageToBot")
         data =  {
             "msgtype": "image",
             "image": {
@@ -195,7 +225,6 @@ def postImageToBot(imageBase64, md5Value):
         _postToBot(data)
 
 def _postToBot(data):
-    print("postToBot")
     url = "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=7c5256e0-68cc-4f41-afa5-90ad13c7a87f"
     json_data = json.dumps(data)
     requests.post(url, data=json_data, headers=COMMON_HEADERS)
